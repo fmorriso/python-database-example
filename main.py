@@ -1,6 +1,7 @@
 """
 https://www.sqlite.org/lang_datefunc.html
 https://docs.python.org/3/library/datetime.html
+https://www.sqlite.org/index.html
 """
 import sys, sqlite3
 from datetime import datetime
@@ -10,19 +11,21 @@ def get_python_version() -> str:
     return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 
-def get_all_rows(table_name: str, cur: sqlite3.Cursor):
+def display_all_rows(table_name: str, cur: sqlite3.Cursor):
+    """Displays all rows in the specified table using the specified cursor."""
     for row in cursor.execute(f"SELECT * FROM {table_name};"):
         print(row)
 
 
 def get_server_datetime(cur: sqlite3.Cursor) -> datetime:
+    """returns a Python datetime object containing the current SQLlite server's date/time."""
     query: str = """
     SELECT datetime('now', 'localtime') LocalTime;
     """
     results = cur.execute(query)
     row_local = results.fetchone()
     datetime_str: str = str(row_local[0])
-    column_name: str = results.description[0][0]
+    # column_name: str = results.description[0][0]
     # print(type(datetime_str))
     # print(datetime_str)
     dt = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
@@ -30,6 +33,7 @@ def get_server_datetime(cur: sqlite3.Cursor) -> datetime:
 
 
 def table_exists(name: str, cur: sqlite3.Cursor) -> bool:
+    """Returns True of the speicifed table exists; otherwise returns False"""
     query_exists: str = f"""
                 SELECT EXISTS (
                     SELECT 
@@ -55,7 +59,7 @@ def table_exists(name: str, cur: sqlite3.Cursor) -> bool:
 if __name__ == "__main__":
     print(f"Python version {get_python_version()}")
 
-    print(sqlite3.version)
+    print(f"SQL Lite version: {sqlite3.version}")
     # https://docs.python.org/3/library/sqlite3.html
     with sqlite3.connect(":memory:") as connection:
         # print(connection)
@@ -92,4 +96,4 @@ if __name__ == "__main__":
         for row in cursor.execute(f"SELECT year, title FROM {table_name} ORDER BY year"):
             print(row)
         """
-        get_all_rows(table_name, cursor)
+        display_all_rows(table_name, cursor)
